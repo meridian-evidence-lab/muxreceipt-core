@@ -1,0 +1,13 @@
+import test from 'node:test'; import assert from 'node:assert/strict'; import {readFileSync} from 'node:fs'; import {audit} from './index.mjs';
+const sample=()=>JSON.parse(readFileSync(new URL('./sample.json',import.meta.url),'utf8'));
+test('preserves u64 IDs and amounts above Number precision',()=>assert.equal(audit(sample()).totals[0].amount,'9007199254740993'));
+test('deduplicates repeated source event',()=>{const x=sample();x.events.push({...x.events[0]});assert.equal(audit(x).accepted.length,1);assert.equal(audit(x).duplicates.length,1)});
+test('conflicting IDs never receive credit',()=>{const x=sample();x.events.push({...x.events[0],amount:'3'});const r=audit(x);assert.equal(r.accepted.length,0);assert.equal(r.exceptions[0].reason,'conflicting-event-id')});
+test('network identity isolates replay',()=>{const x=sample();x.events[0].network='synthetic:mainnet';assert.equal(audit(x).accepted.length,0)});
+test('unknown ID is quarantined',()=>{const x=sample();x.events[0].muxedId='0';assert.equal(audit(x).exceptions.length,1)});
+test('wrong asset is quarantined',()=>{const x=sample();x.events[0].asset='other';assert.equal(audit(x).exceptions.length,1)});
+test('numeric IDs are refused',()=>{const x=sample();x.events[0].muxedId=1;assert.equal(audit(x).exceptions.length,1)});
+test('overlapping mapping is refused',()=>{const x=sample();x.mappings.push({...x.mappings[0],tenant:'customer-b'});assert.throws(()=>audit(x),/Overlapping/)});
+test('mapping boundary is exclusive',()=>{const x=sample();x.mappings[0].untilLedger=101;x.events[0].ledger=101;assert.equal(audit(x).exceptions.length,1)});
+test('mapping transitions preserve historical ownership',()=>{const x=sample();x.mappings[0].untilLedger=101;x.mappings.push({...x.mappings[0],tenant:'customer-b',fromLedger:101,untilLedger:null});x.events.push({...x.events[0],id:'event-next',ledger:101});assert.deepEqual(audit(x).accepted.map(e=>e.tenant),['customer-a','customer-b'])});
+test('negative amounts and failed events are refused',()=>{for(const patch of [{amount:'-1'},{successful:false},{amount:((1n<<127n)).toString()}]){const x=sample();Object.assign(x.events[0],patch);assert.equal(audit(x).exceptions.length,1)}});

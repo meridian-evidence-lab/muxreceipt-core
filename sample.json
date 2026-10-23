@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "mappings": [
+    {
+      "network": "synthetic:testnet",
+      "contract": "contract-demo",
+      "asset": "asset-demo",
+      "tenant": "customer-a",
+      "muxedId": "18446744073709551615",
+      "fromLedger": 100,
+      "untilLedger": null
+    }
+  ],
+  "events": [
+    {
+      "network": "synthetic:testnet",
+      "id": "event-100-1",
+      "ledger": 100,
+      "contract": "contract-demo",
+      "asset": "asset-demo",
+      "muxedId": "18446744073709551615",
+      "amount": "9007199254740993",
+      "successful": true,
+      "type": "transfer"
+    }
+  ]
+}
