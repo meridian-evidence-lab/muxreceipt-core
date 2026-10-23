@@ -1,5 +1,14 @@
 # MuxReceipt · Audit engine
 
+## Connected application
+
+This module is part of a seven-repository application. Start with the [muxreceipt-frontend integration guide](https://github.com/meridian-evidence-lab/muxreceipt-frontend/blob/main/INTEGRATION.md) for complete setup and the frontend → backend → core/review/contracts data flow.
+
+- [muxreceipt-frontend](https://github.com/meridian-evidence-lab/muxreceipt-frontend)
+- [muxreceipt-backend](https://github.com/meridian-evidence-lab/muxreceipt-backend)
+- [muxreceipt-contracts](https://github.com/meridian-evidence-lab/muxreceipt-contracts)
+
+
 Deterministic customer attribution and exception accounting for normalized Stellar shared-contract transfers.
 
 **Status: 0.1.0 offline prototype.** Uses normalized synthetic JSON. No live Stellar adapter,
@@ -11,7 +20,7 @@ Bell introduces muxed contract destinations. Applications need to audit which cu
 
 ## Run locally
 
-Node.js 22+; no third-party dependencies. Clone the four project repositories into sibling
+Node.js 22+; no third-party dependencies. Clone the project repositories into sibling
 folders. The CLI and scenario consumer tests import `../muxreceipt-core/index.mjs`.
 The core and review renderer also work independently. Packages remain private until a versioned release.
 
